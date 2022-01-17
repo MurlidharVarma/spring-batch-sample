@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scdf-server
+  labels:
+    app: scdf-server
+data:
+  application.yaml: |-
+    management:
+      metrics:
+        export:
+          prometheus:
+            enabled: true
+            rsocket:
+              enabled: true
+              host: prometheus-proxy
+              port: 7001
+    spring:
+      cloud:
+        dataflow:
+          metrics.dashboard:
+            url: 'http://127.0.0.1:51292'
+          task:
+            platform:
+              kubernetes:
+                accounts:
+                  default:
+                    entryPointStyle: boot
+                    limits:
+                      memory: 1024Mi
+      datasource:
+        url: jdbc:mariadb://${MARIADB_SERVICE_HOST}:${MARIADB_SERVICE_PORT}/mysql
+        username: root
+        password: ${mariadb-root-password}
+        driverClassName: org.mariadb.jdbc.Driver
+        testOnBorrow: true
+        validationQuery: "SELECT 1"
+      jpa:
+        hibernate:
+          show-sql: true
+          ddl-auto: create-drop
+          use-new-id-generator-mappings: false
+          naming:
+            physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+
