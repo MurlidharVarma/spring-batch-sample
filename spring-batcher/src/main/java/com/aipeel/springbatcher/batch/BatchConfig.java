@@ -2,6 +2,8 @@ package com.aipeel.springbatcher.batch;
 
 import com.aipeel.springbatcher.entity.Tweet;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -12,7 +14,9 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.task.configuration.EnableTask;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +43,7 @@ public class BatchConfig {
         this.stepBuilder = stepBuilder;
     }
 
+
     @Bean
     public Job job(JobBuilderFactory jobBuilder, Step step){
         return jobBuilder.get("ai-peel-job")
@@ -48,8 +53,25 @@ public class BatchConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(
+            value="spring.batch.job.enabled",
+            havingValue = "false")
     @JobScope
     public Step getStep( @Value("#{jobParameters['CHUNK']}") Long chunkSize){
+        TaskletStep step = stepBuilder.get("ai-peel-step")
+                .chunk(Math.toIntExact(chunkSize))
+                .reader(getItemReader(dataSource))
+                .writer(itemWriter)
+                .build();
+        return step;
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+            value="spring.batch.job.enabled",
+            havingValue = "true",
+            matchIfMissing = false)
+    public Step getDefaultStep(){
         TaskletStep step = stepBuilder.get("ai-peel-step")
                 .chunk(Math.toIntExact(chunkSize))
                 .reader(getItemReader(dataSource))

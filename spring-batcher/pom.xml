@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>com.aipeel</groupId>
-	<artifactId>spring-batcher</artifactId>
+	<artifactId>springbatcher</artifactId>
 	<version>0.0.1</version>
 	<name>spring-batcher</name>
 	<description>Demo project for Spring Boot</description>

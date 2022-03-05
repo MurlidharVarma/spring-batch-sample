@@ -22,6 +22,7 @@ public class TweetWriter implements ItemWriter {
         for(Object to: list){
             Tweet t =(Tweet) to;
             logger.info(t.getId()+" : "+t.getUser()+" : "+t.getTweet());
+            Thread.sleep(10);
         }
     }
 }

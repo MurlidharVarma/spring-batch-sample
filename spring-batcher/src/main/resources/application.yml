@@ -1,8 +1,9 @@
 spring:
   batch:
     job:
-      enabled: false
+      enabled: true
   main:
+    web-application-type: none #Remove this line if Web Application (Embedded Tomcat) to be turned on for REST API
     allow-bean-definition-overriding: true
   h2:
     console:
